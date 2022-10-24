@@ -3,23 +3,22 @@
 # running: cog predict -i img=@inputs/00017_gray.png -i version='General - v3' -i scale=2 -i face_enhance=True -i tile=0
 # push: cog push r8.im/xinntao/realesrgan
 
+from realesrgan.utils import RealESRGANer
+import numpy as np
+from basicsr.archs.srvgg_arch import SRVGGNetCompact
+from basicsr.archs.rrdbnet_arch import RRDBNet
+from PIL import Image
+import base64
+from io import BytesIO
+import torch
+import tempfile
+import shutil
+import cv2
 import os
 
 os.system('pip install gfpgan')
 os.system('python setup.py develop')
 
-import cv2
-import shutil
-import tempfile
-import torch
-from io import BytesIO
-import base64
-from PIL import Image
-from basicsr.archs.rrdbnet_arch import RRDBNet
-from basicsr.archs.srvgg_arch import SRVGGNetCompact
-import numpy as np
-
-from realesrgan.utils import RealESRGANer
 
 try:
     from cog import BasePredictor, Input, Path
@@ -93,8 +92,7 @@ class Predictor(BasePredictor):
         face_enhance: bool = Input(
             description='Enhance faces with GFPGAN. Note that it does not work for anime images/vidoes', default=False),
         tile: int = Input(
-            description=
-            'Tile size. Default is 0, that is no tile. When encountering the out-of-GPU-memory issue, please specify it, e.g., 400 or 200',
+            description='Tile size. Default is 0, that is no tile. When encountering the out-of-GPU-memory issue, please specify it, e.g., 400 or 200',
             default=0)
     ) -> Path:
         if tile <= 100 or tile is None:
@@ -102,9 +100,9 @@ class Predictor(BasePredictor):
         print(f'img: {img}. version: {version}. scale: {scale}. face_enhance: {face_enhance}. tile: {tile}.')
         try:
             init_image = Image.open(BytesIO(base64.b64decode(img))).convert("RGB")
-	    extension = "png"
-	    img = cv2.cvtColor(np.array(init_image), cv2.COLOR_RGB2BGR)            
-	    if len(img.shape) == 3 and img.shape[2] == 4:
+            extension = "png"
+            img = cv2.cvtColor(np.array(init_image), cv2.COLOR_RGB2BGR)
+            if len(img.shape) == 3 and img.shape[2] == 4:
                 img_mode = 'RGBA'
             elif len(img.shape) == 2:
                 img_mode = None
@@ -137,6 +135,7 @@ class Predictor(BasePredictor):
             print('global exception: ', error)
         finally:
             clean_folder('output')
+
 
 def clean_folder(folder):
     for filename in os.listdir(folder):
