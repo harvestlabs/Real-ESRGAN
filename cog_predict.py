@@ -12,8 +12,12 @@ import cv2
 import shutil
 import tempfile
 import torch
+from io import BytesIO
+import base64
+from PIL import Image
 from basicsr.archs.rrdbnet_arch import RRDBNet
 from basicsr.archs.srvgg_arch import SRVGGNetCompact
+import numpy as np
 
 from realesrgan.utils import RealESRGANer
 
@@ -80,7 +84,7 @@ class Predictor(BasePredictor):
 
     def predict(
         self,
-        img: Path = Input(description='Input'),
+        img: str = Input(description='Input Image'),
         version: str = Input(
             description='RealESRGAN version. Please see [Readme] below for more descriptions',
             choices=['General - RealESRGANplus', 'General - v3', 'Anime - anime6B', 'AnimeVideo - v3'],
@@ -97,9 +101,10 @@ class Predictor(BasePredictor):
             tile = 0
         print(f'img: {img}. version: {version}. scale: {scale}. face_enhance: {face_enhance}. tile: {tile}.')
         try:
-            extension = os.path.splitext(os.path.basename(str(img)))[1]
-            img = cv2.imread(str(img), cv2.IMREAD_UNCHANGED)
-            if len(img.shape) == 3 and img.shape[2] == 4:
+            init_image = Image.open(BytesIO(base64.b64decode(img))).convert("RGB")
+	    extension = "png"
+	    img = cv2.cvtColor(np.array(init_image), cv2.COLOR_RGB2BGR)            
+	    if len(img.shape) == 3 and img.shape[2] == 4:
                 img_mode = 'RGBA'
             elif len(img.shape) == 2:
                 img_mode = None
@@ -125,16 +130,13 @@ class Predictor(BasePredictor):
 
             if img_mode == 'RGBA':  # RGBA images should be saved in png format
                 extension = 'png'
-            # save_path = f'output/out.{extension}'
-            # cv2.imwrite(save_path, output)
             out_path = Path(tempfile.mkdtemp()) / f'out.{extension}'
             cv2.imwrite(str(out_path), output)
+            return out_path
         except Exception as error:
             print('global exception: ', error)
         finally:
             clean_folder('output')
-        return out_path
-
 
 def clean_folder(folder):
     for filename in os.listdir(folder):

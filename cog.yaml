@@ -3,16 +3,17 @@ image: "r8.im/tencentarc/realesrgan"
 
 build:
   gpu: true
-  python_version: "3.8"
+  cuda: "11.6.2"
+  python_version: "3.9"
   system_packages:
     - "libgl1-mesa-glx"
     - "libglib2.0-0"
   python_packages:
-    - "torch==1.7.1"
-    - "torchvision==0.8.2"
-    - "numpy==1.21.1"
+    - "torch==1.12.0 --extra-index-url=https://download.pytorch.org/whl/cu116"
+    - "torchvision==0.13.0"
+    - "numpy==1.23.4"
     - "lmdb==1.2.1"
-    - "opencv-python==4.5.3.56"
+    - "opencv-python==4.6.0.66"
     - "PyYAML==5.4.1"
     - "tqdm==4.62.2"
     - "yapf==0.31.0"
