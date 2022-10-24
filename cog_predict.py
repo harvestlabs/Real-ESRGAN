@@ -2,25 +2,24 @@
 # This file is used for deploying replicate models
 # running: cog predict -i img=@inputs/00017_gray.png -i version='General - v3' -i scale=2 -i face_enhance=True -i tile=0
 # push: cog push r8.im/xinntao/realesrgan
-
-from realesrgan.utils import RealESRGANer
-import numpy as np
-from basicsr.archs.srvgg_arch import SRVGGNetCompact
-from basicsr.archs.rrdbnet_arch import RRDBNet
-from PIL import Image
-import base64
-from io import BytesIO
-import torch
-import tempfile
-import shutil
-import cv2
 import os
+import cv2
+import shutil
+import tempfile
+import torch
+from io import BytesIO
+import base64
+from PIL import Image
+from basicsr.archs.rrdbnet_arch import RRDBNet
+from basicsr.archs.srvgg_arch import SRVGGNetCompact
+import numpy as np
 
 os.system('pip install gfpgan')
 os.system('python setup.py develop')
 
 
 try:
+    from realesrgan.utils import RealESRGANer
     from cog import BasePredictor, Input, Path
     from gfpgan import GFPGANer
 except Exception:
