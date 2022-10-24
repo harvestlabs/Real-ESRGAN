@@ -129,7 +129,7 @@ class Predictor(BasePredictor):
                 extension = 'png'
             out_path = Path(tempfile.mkdtemp()) / f'out.{extension}'
             cv2.imwrite(str(out_path), output)
-            return out_path
+            return dict(data=out_path)
         except Exception as error:
             print('global exception: ', error)
         finally:
