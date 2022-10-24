@@ -93,10 +93,10 @@ class Predictor(BasePredictor):
         tile: int = Input(
             description='Tile size. Default is 0, that is no tile. When encountering the out-of-GPU-memory issue, please specify it, e.g., 400 or 200',
             default=0)
-    ) -> Path:
+    ) -> dict:
         if tile <= 100 or tile is None:
             tile = 0
-        print(f'img: {img}. version: {version}. scale: {scale}. face_enhance: {face_enhance}. tile: {tile}.')
+        print(f'img:  xx{img}. version: {version}. scale: {scale}. face_enhance: {face_enhance}. tile: {tile}.')
         try:
             init_image = Image.open(BytesIO(base64.b64decode(img))).convert("RGB")
             extension = "png"
